@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6621702594129758283}
   - component: {fileID: 5016904080773481025}
   - component: {fileID: 8043033962220559229}
-  - component: {fileID: 852261372141687343}
   - component: {fileID: 5892447352614228926}
   m_Layer: 10
   m_Name: trigger
@@ -146,22 +145,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerId: 0
-  DetectorsCount: 0
-  DetectorId: 0
---- !u!114 &852261372141687343
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3534224596487852988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee6b92f867cc46ab972d6e7b1fd7967a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EntityForDestroy: {fileID: 0}
-  Delay: 0
 --- !u!114 &5892447352614228926
 MonoBehaviour:
   m_ObjectHideFlags: 0
