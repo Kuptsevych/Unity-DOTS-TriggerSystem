@@ -14,16 +14,10 @@ public class TriggerDetectorSystem : ComponentSystem
 	private readonly Collider2D[] _colliders = new Collider2D[MaxColliders];
 
 	private readonly int[] _triggersCache = new int[MaxColliders];
-
-	private readonly HashSet<int> _triggersSet = new HashSet<int>();
-
+	
 	private readonly LayerMask _triggerMask = LayerMask.GetMask("Triggers");
 
 	private readonly Dictionary<Entity, HashSet<int>> _detectorTriggers = new Dictionary<Entity, HashSet<int>>();
-
-	private readonly List<int> _removeOldTriggers = new List<int>(MaxColliders);
-
-	private readonly List<ValueTuple<ComponentType, Entity>> _cachedComponentAndTriggers = new List<ValueTuple<ComponentType, Entity>>();
 
 	private readonly Dictionary<ComponentType, Action<EntityManager, Entity, Entity>> _conversion =
 		new Dictionary<ComponentType, Action<EntityManager, Entity, Entity>>(MaxEntitites);
@@ -33,10 +27,15 @@ public class TriggerDetectorSystem : ComponentSystem
 	private readonly Dictionary<Entity, HashSet<ComponentType>> _entityEffects = new Dictionary<Entity, HashSet<ComponentType>>(MaxEntitites);
 
 	private TriggerInitSystem _triggerInitSystem;
-
+	
 	protected override void OnCreate()
 	{
 		_entityQuery = GetEntityQuery(typeof(Initialized), typeof(DetectorComponent), typeof(Transform));
+	}
+
+	protected override void OnDestroy()
+	{
+		
 	}
 
 	protected override void OnStartRunning()
@@ -55,36 +54,38 @@ public class TriggerDetectorSystem : ComponentSystem
 			var detector  = detectors[i];
 			var transform = transforms[i];
 
+			//TODO physics move to separate system
 			var count = Physics2D.OverlapBoxNonAlloc(transform.position, detector.Size, transform.rotation.eulerAngles.z, _colliders, _triggerMask);
 
 			detector.TriggersCount = count;
 
-			_triggersSet.Clear();
-
+			var triggersSet = new NativeHashMap<int, bool>(MaxColliders, Allocator.Temp);
+			
 			for (int j = 0; j < count; j++)
 			{
 				_triggersCache[j] = _colliders[j].GetInstanceID();
-				_triggersSet.Add(_triggersCache[j]);
+				triggersSet.Add(_triggersCache[j], false);
 			}
 
 			if (_detectorTriggers.TryGetValue(entities[i], out HashSet<int> triggerIds))
 			{
-				_removeOldTriggers.Clear();
+				int removeOldTriggersCount = 0;
+				var removeOldTriggers      = new NativeArray<int>(MaxColliders, Allocator.Temp);
 
 				foreach (var id in triggerIds)
 				{
 					// in new triggers there is no old
-					if (!_triggersSet.Contains(id))
+					if (!triggersSet.ContainsKey(id))
 					{
-						_removeOldTriggers.Add(id);
+						removeOldTriggers[removeOldTriggersCount++] = id;
 						Debug.Log("Trigger exit::" + id);
 						TryRemoveComponentsFromTriggers(EntityManager, entities[i], id);
 					}
 				}
 
-				for (var k = 0; k < _removeOldTriggers.Count; k++)
+				for (var k = 0; k < removeOldTriggersCount; k++)
 				{
-					triggerIds.Remove(_removeOldTriggers[k]);
+					triggerIds.Remove(removeOldTriggers[k]);
 				}
 
 				for (int j = 0; j < count; j++)
@@ -98,6 +99,8 @@ public class TriggerDetectorSystem : ComponentSystem
 						TryAddComponentsFromTriggers(EntityManager, entities[i]);
 					}
 				}
+
+				removeOldTriggers.Dispose();
 			}
 			else
 			{
@@ -111,6 +114,7 @@ public class TriggerDetectorSystem : ComponentSystem
 				}
 			}
 
+			triggersSet.Dispose();
 
 			detectors[i] = detector;
 		}
@@ -171,7 +175,7 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	private void TryAddComponentsFromTriggers(EntityManager em, Entity detector)
 	{
-		_cachedComponentAndTriggers.Clear();
+		var cachedComponentAndTriggers = new NativeList<ValueTuple<ComponentType, Entity>>(Allocator.Temp);
 
 		if (!_entityEffects.TryGetValue(detector, out var entityEffects))
 		{
@@ -191,7 +195,7 @@ public class TriggerDetectorSystem : ComponentSystem
 					{
 						var componentType = components[i];
 
-						if (!entityEffects.Contains(componentType)) _cachedComponentAndTriggers.Add((componentType, entity));
+						if (!entityEffects.Contains(componentType)) cachedComponentAndTriggers.Add((componentType, entity));
 					}
 
 					components.Dispose();
@@ -199,9 +203,9 @@ public class TriggerDetectorSystem : ComponentSystem
 			}
 		}
 
-		for (var i = 0; i < _cachedComponentAndTriggers.Count; i++)
+		for (var i = 0; i < cachedComponentAndTriggers.Length; i++)
 		{
-			var componentAndTrigger = _cachedComponentAndTriggers[i];
+			var componentAndTrigger = cachedComponentAndTriggers[i];
 
 			if (_conversion.TryGetValue(componentAndTrigger.Item1, out var value))
 			{
@@ -209,5 +213,7 @@ public class TriggerDetectorSystem : ComponentSystem
 				entityEffects.Add(componentAndTrigger.Item1);
 			}
 		}
+
+		cachedComponentAndTriggers.Dispose();
 	}
 }
