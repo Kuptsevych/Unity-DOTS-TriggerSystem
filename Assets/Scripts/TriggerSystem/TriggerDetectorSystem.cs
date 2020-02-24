@@ -25,17 +25,13 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	private readonly List<ValueTuple<ComponentType, Entity>> _cachedComponentAndTriggers = new List<ValueTuple<ComponentType, Entity>>();
 
-	private readonly HashSet<ComponentType> _remainTriggersEffects = new HashSet<ComponentType>();
-
-	private readonly List<ComponentType> _triggerToRemoveEffects = new List<ComponentType>();
-
 	private readonly Dictionary<ComponentType, Action<EntityManager, Entity, Entity>> _conversion =
 		new Dictionary<ComponentType, Action<EntityManager, Entity, Entity>>(MaxEntitites);
 
 	public Dictionary<ComponentType, Action<EntityManager, Entity, Entity>> Conversion => _conversion;
 
 	private readonly Dictionary<Entity, HashSet<ComponentType>> _entityEffects = new Dictionary<Entity, HashSet<ComponentType>>(MaxEntitites);
-	
+
 	private TriggerInitSystem _triggerInitSystem;
 
 	protected override void OnCreate()
@@ -127,8 +123,8 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	private void TryRemoveComponentsFromTriggers(EntityManager em, Entity detector, int trigger)
 	{
-		_remainTriggersEffects.Clear();
-		_triggerToRemoveEffects.Clear();
+		var remainTriggersEffects  = new NativeHashMap<ComponentType, bool>();
+		var triggerToRemoveEffects = new NativeList<ComponentType>(Allocator.Temp);
 
 		if (_detectorTriggers.TryGetValue(detector, out var triggerIds))
 		{
@@ -142,14 +138,14 @@ public class TriggerDetectorSystem : ComponentSystem
 					{
 						for (var i = 0; i < components.Length; i++)
 						{
-							if (_conversion.ContainsKey(components[i])) _triggerToRemoveEffects.Add(components[i]);
+							if (_conversion.ContainsKey(components[i])) triggerToRemoveEffects.Add(components[i]);
 						}
 					}
 					else
 					{
 						for (var i = 0; i < components.Length; i++)
 						{
-							if (_conversion.ContainsKey(components[i])) _remainTriggersEffects.Add(components[i]);
+							if (_conversion.ContainsKey(components[i])) remainTriggersEffects.Add(components[i], false);
 						}
 					}
 
@@ -158,16 +154,19 @@ public class TriggerDetectorSystem : ComponentSystem
 			}
 		}
 
-		for (var i = 0; i < _triggerToRemoveEffects.Count; i++)
+		for (var i = 0; i < triggerToRemoveEffects.Length; i++)
 		{
-			var componentType = _triggerToRemoveEffects[i];
+			var componentType = triggerToRemoveEffects[i];
 
-			if (!_remainTriggersEffects.Contains(componentType))
+			if (!remainTriggersEffects.IsCreated || !remainTriggersEffects.ContainsKey(componentType))
 			{
 				PostUpdateCommands.RemoveComponent(detector, componentType);
 				_entityEffects[detector].Remove(componentType);
 			}
 		}
+
+		if (remainTriggersEffects.IsCreated) remainTriggersEffects.Dispose();
+		triggerToRemoveEffects.Dispose();
 	}
 
 	private void TryAddComponentsFromTriggers(EntityManager em, Entity detector)
