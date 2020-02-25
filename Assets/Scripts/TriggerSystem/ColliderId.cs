@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 
-public struct Id : IBufferElementData
+public struct ColliderId : IBufferElementData
 {
 	public int Value;
 }

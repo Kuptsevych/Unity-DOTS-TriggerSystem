@@ -59,14 +59,14 @@ public class DetectorOverlap2dSystem : ComponentSystem
 			{
 				detector.TriggersCheckSum = triggersHash;
 
-				DynamicBuffer<Id> buffer = EntityManager.GetBuffer<Id>(entities[i]);
+				DynamicBuffer<ColliderId> buffer = EntityManager.GetBuffer<ColliderId>(entities[i]);
 
 				buffer.Clear();
 
 				for (var index = 0; index < triggerIds.Length; index++)
 				{
 					int id = triggerIds[index];
-					buffer.Add(new Id {Value = id});
+					buffer.Add(new ColliderId {Value = id});
 				}
 			}
 

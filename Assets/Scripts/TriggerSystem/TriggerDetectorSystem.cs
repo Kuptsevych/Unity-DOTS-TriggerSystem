@@ -11,11 +11,7 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	private EntityQuery _entityQuery;
 
-	private readonly Collider2D[] _colliders = new Collider2D[MaxColliders];
-
 	private readonly int[] _triggersCache = new int[MaxColliders];
-	
-	private readonly LayerMask _triggerMask = LayerMask.GetMask("Triggers");
 
 	private readonly Dictionary<Entity, HashSet<int>> _detectorTriggers = new Dictionary<Entity, HashSet<int>>();
 
@@ -27,15 +23,10 @@ public class TriggerDetectorSystem : ComponentSystem
 	private readonly Dictionary<Entity, HashSet<ComponentType>> _entityEffects = new Dictionary<Entity, HashSet<ComponentType>>(MaxEntitites);
 
 	private TriggerInitSystem _triggerInitSystem;
-	
+
 	protected override void OnCreate()
 	{
-		_entityQuery = GetEntityQuery(typeof(Initialized), typeof(DetectorComponent), typeof(Transform));
-	}
-
-	protected override void OnDestroy()
-	{
-		
+		_entityQuery = GetEntityQuery(typeof(Initialized), typeof(DetectorComponent));
 	}
 
 	protected override void OnStartRunning()
@@ -45,26 +36,22 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	protected override void OnUpdate()
 	{
-		var detectors  = _entityQuery.ToComponentDataArray<DetectorComponent>(Allocator.TempJob);
-		var transforms = _entityQuery.ToComponentArray<Transform>();
-		var entities   = _entityQuery.ToEntityArray(Allocator.TempJob);
+		var detectors = _entityQuery.ToComponentDataArray<DetectorComponent>(Allocator.TempJob);
+		var entities  = _entityQuery.ToEntityArray(Allocator.TempJob);
 
 		for (var i = 0; i < detectors.Length; i++)
 		{
-			var detector  = detectors[i];
-			var transform = transforms[i];
-
-			//TODO physics move to separate system
-			var count = Physics2D.OverlapBoxNonAlloc(transform.position, detector.Size, transform.rotation.eulerAngles.z, _colliders, _triggerMask);
-
-			detector.TriggersCount = count;
+			var detector = detectors[i];
 
 			var triggersSet = new NativeHashMap<int, bool>(MaxColliders, Allocator.Temp);
-			
-			for (int j = 0; j < count; j++)
+
+			DynamicBuffer<ColliderId> buffer = EntityManager.GetBuffer<ColliderId>(entities[i]);
+
+			for (var index = 0; index < buffer.Length; index++)
 			{
-				_triggersCache[j] = _colliders[j].GetInstanceID();
-				triggersSet.Add(_triggersCache[j], false);
+				ColliderId colliderId = buffer[index];
+				_triggersCache[index] = colliderId.Value;
+				triggersSet.Add(colliderId.Value, false);
 			}
 
 			if (_detectorTriggers.TryGetValue(entities[i], out HashSet<int> triggerIds))
@@ -88,7 +75,7 @@ public class TriggerDetectorSystem : ComponentSystem
 					triggerIds.Remove(removeOldTriggers[k]);
 				}
 
-				for (int j = 0; j < count; j++)
+				for (int j = 0; j < detector.TriggersCount; j++)
 				{
 					var triggerId = _triggersCache[j];
 
@@ -104,7 +91,7 @@ public class TriggerDetectorSystem : ComponentSystem
 			}
 			else
 			{
-				for (int j = 0; j < count; j++)
+				for (int j = 0; j < detector.TriggersCount; j++)
 				{
 					var triggerId = _triggersCache[j];
 
