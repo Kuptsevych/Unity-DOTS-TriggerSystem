@@ -38,6 +38,8 @@ public class DetectorInitSystem : ComponentSystem
 			ColliderToDetectorEntity.TryAdd(colliders[i].GetInstanceID(), entities[i]);
 
 			PostUpdateCommands.AddComponent(entities[i], new Initialized());
+			
+			EntityManager.AddBuffer<Id>(entities[i]);
 		}
 
 		_entityQuery.CopyFromComponentDataArray(detectors);
