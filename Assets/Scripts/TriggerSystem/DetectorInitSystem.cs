@@ -31,14 +31,12 @@ public class DetectorInitSystem : ComponentSystem
 
 			detector.DetectorId = colliders[i].GetInstanceID();
 
-			detector.Size = colliders[i].size;
-
 			detectors[i] = detector;
 
 			ColliderToDetectorEntity.TryAdd(colliders[i].GetInstanceID(), entities[i]);
 
 			PostUpdateCommands.AddComponent(entities[i], new Initialized());
-			
+
 			EntityManager.AddBuffer<ColliderId>(entities[i]);
 		}
 

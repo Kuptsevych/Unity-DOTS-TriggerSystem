@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class TriggerDetectorSystem : ComponentSystem
 {
-	private const int MaxEntitites = 8;
-	private const int MaxColliders = 8;
+	public const int MaxColliders = 8;
 
 	private EntityQuery _entityQuery;
 
@@ -15,12 +15,12 @@ public class TriggerDetectorSystem : ComponentSystem
 
 	private readonly Dictionary<Entity, HashSet<int>> _detectorTriggers = new Dictionary<Entity, HashSet<int>>();
 
+	private readonly Dictionary<Entity, HashSet<ComponentType>> _entityEffects = new Dictionary<Entity, HashSet<ComponentType>>(MaxColliders);
+
 	private readonly Dictionary<ComponentType, Action<EntityManager, Entity, Entity>> _conversion =
-		new Dictionary<ComponentType, Action<EntityManager, Entity, Entity>>(MaxEntitites);
+		new Dictionary<ComponentType, Action<EntityManager, Entity, Entity>>();
 
 	public Dictionary<ComponentType, Action<EntityManager, Entity, Entity>> Conversion => _conversion;
-
-	private readonly Dictionary<Entity, HashSet<ComponentType>> _entityEffects = new Dictionary<Entity, HashSet<ComponentType>>(MaxEntitites);
 
 	private TriggerInitSystem _triggerInitSystem;
 

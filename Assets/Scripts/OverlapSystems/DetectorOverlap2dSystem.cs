@@ -6,11 +6,9 @@ public class DetectorOverlap2dSystem : ComponentSystem
 {
 	private EntityQuery _entityQuery;
 
-	private const int MaxColliders = 8;
-
 	private readonly LayerMask _triggerMask = LayerMask.GetMask("Triggers");
 
-	private readonly Collider2D[] _colliders = new Collider2D[MaxColliders];
+	private readonly Collider2D[] _colliders = new Collider2D[TriggerDetectorSystem.MaxColliders];
 
 	protected override void OnCreate()
 	{
@@ -55,9 +53,9 @@ public class DetectorOverlap2dSystem : ComponentSystem
 
 			int triggersHash = Utils.CombineHashCodes(triggerIds);
 
-			if (detector.TriggersCheckSum != triggersHash)
+			if (detector.TriggersHash != triggersHash)
 			{
-				detector.TriggersCheckSum = triggersHash;
+				detector.TriggersHash = triggersHash;
 
 				DynamicBuffer<ColliderId> buffer = EntityManager.GetBuffer<ColliderId>(entities[i]);
 

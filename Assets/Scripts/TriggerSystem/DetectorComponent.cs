@@ -4,8 +4,9 @@ using Unity.Mathematics;
 [GenerateAuthoringComponent]
 public struct DetectorComponent : IComponentData
 {
-	public int    DetectorId;
-	public int    TriggersCount;
-	public int    TriggersCheckSum;
-	public float2 Size;
+	public int DetectorId;
+	public int TriggersCount;
+	public int TriggersHash;
+	public int TriggerHashMapIndex;
+	public int EffectHashMapIndex;
 }

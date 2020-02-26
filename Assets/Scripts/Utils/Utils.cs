@@ -12,13 +12,17 @@ public static class Utils
 		{
 			var hashCode = hashCodes[index];
 			if (i % 2 == 0)
+			{
 				hash1 = ((hash1 << 5) + hash1 + (hash1 >> 27)) ^ hashCode;
+			}
 			else
+			{
 				hash2 = ((hash2 << 5) + hash2 + (hash2 >> 27)) ^ hashCode;
+			}
 
 			++i;
 		}
 
-		return hash1 + (hash2 * 1566083941);
+		return hash1 + hash2 * 1566083941;
 	}
 }
