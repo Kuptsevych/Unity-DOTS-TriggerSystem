@@ -1,6 +1,5 @@
-﻿using Unity.Collections;
+using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 public class TriggerEffectVfxSystem : ComponentSystem
 {
@@ -10,12 +9,9 @@ public class TriggerEffectVfxSystem : ComponentSystem
 	{
 		var queryDesc = new EntityQueryDesc
 		{
-			//None = new[] {ComponentType.ReadOnly<Initialized>()},
 			All = new[]
 			{
-				ComponentType.ReadOnly<DetectorComponent>(),
-				ComponentType.ReadOnly<TriggerEffectVfxComponent>(),
-				ComponentType.ReadOnly<Transform>()
+				ComponentType.ReadOnly<SimpleSpark>()
 			}
 		};
 
@@ -24,29 +20,28 @@ public class TriggerEffectVfxSystem : ComponentSystem
 
 	protected override void OnUpdate()
 	{
-		var effects  = _entityQuery.ToComponentDataArray<TriggerEffectVfxComponent>(Allocator.TempJob);
+		var sparks   = _entityQuery.ToComponentDataArray<SimpleSpark>(Allocator.TempJob);
 		var entities = _entityQuery.ToEntityArray(Allocator.TempJob);
 
-		var transforms = _entityQuery.ToComponentArray<Transform>();
+		var dt = Time.DeltaTime;
 
-		for (var i = 0; i < effects.Length; i++)
+		for (var i = 0; i < sparks.Length; i++)
 		{
-			var effect = effects[i];
+			var spark = sparks[i];
 
-			if (!effect.Used)
+			spark.Timer += dt;
+
+			if (spark.Timer > spark.DestroyDelay)
 			{
-				effect.Used = true;
-
-				//EntityManager.Instantiate(effect.VfxPrefab);
-				//TODO instantiate gameobject
+				PostUpdateCommands.DestroyEntity(entities[i]);
 			}
 
-			effects[i] = effect;
+			sparks[i] = spark;
 		}
 
-		_entityQuery.CopyFromComponentDataArray(effects);
+		_entityQuery.CopyFromComponentDataArray(sparks);
 
-		effects.Dispose();
+		sparks.Dispose();
 		entities.Dispose();
 	}
 }
