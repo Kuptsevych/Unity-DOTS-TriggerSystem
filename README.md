@@ -8,18 +8,18 @@
 
 ## How to use
 
-** See the examples in the project **
+**See the examples in the project**
 
 ### Step 1
 
 Create an effect component
 
 ```csharp
-	public struct SimpleTriggerEffect : IComponentData
-	{
-		public Color Color;
-		public bool  Used;
-	}
+public struct SimpleTriggerEffect : IComponentData
+{
+	public Color Color;
+	public bool  Used;
+}
 ```
 
 ### Step 2
@@ -35,27 +35,27 @@ Register the component in the system (See AddTriggerEffectsSystem ComponentSyste
 Create a prefab with conversion for the trigger
 
 ```csharp
-	public class SimpleTriggerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+public class SimpleTriggerAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+{
+	public Color Color;
+
+	public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
 	{
-		public Color Color;
+		conversionSystem.AddHybridComponent(GetComponent<SpriteRenderer>());
+		conversionSystem.AddHybridComponent(GetComponent<Transform>());
+		conversionSystem.AddHybridComponent(GetComponent<Rigidbody2D>());
+		conversionSystem.AddHybridComponent(GetComponent<BoxCollider2D>());
 
-		public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
+		dstManager.AddComponent<TriggerComponent>(entity);
+		dstManager.AddComponent<Enabled>(entity);
+		dstManager.AddComponent<SimpleTriggerEffect>(entity);
+
+		dstManager.SetComponentData(entity, new SimpleTriggerEffect
 		{
-			conversionSystem.AddHybridComponent(GetComponent<SpriteRenderer>());
-			conversionSystem.AddHybridComponent(GetComponent<Transform>());
-			conversionSystem.AddHybridComponent(GetComponent<Rigidbody2D>());
-			conversionSystem.AddHybridComponent(GetComponent<BoxCollider2D>());
-
-			dstManager.AddComponent<TriggerComponent>(entity);
-			dstManager.AddComponent<Enabled>(entity);
-			dstManager.AddComponent<SimpleTriggerEffect>(entity);
-
-			dstManager.SetComponentData(entity, new SimpleTriggerEffect
-			{
-				Color = Color
-			});
-		}
+			Color = Color
+		});
 	}
+}
 ```
 
 ![](README/step4.png)
@@ -65,22 +65,22 @@ Create a prefab with conversion for the trigger
 Create a prefab with conversion for the detector
 
 ```csharp
-	public class SimpleDetectorAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+public class SimpleDetectorAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+{
+	public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
 	{
-		public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
-		{
-			conversionSystem.AddHybridComponent(GetComponent<SpriteRenderer>());
-			conversionSystem.AddHybridComponent(GetComponent<Transform>());
-			conversionSystem.AddHybridComponent(GetComponent<Rigidbody2D>());
-			conversionSystem.AddHybridComponent(GetComponent<BoxCollider2D>());
+		conversionSystem.AddHybridComponent(GetComponent<SpriteRenderer>());
+		conversionSystem.AddHybridComponent(GetComponent<Transform>());
+		conversionSystem.AddHybridComponent(GetComponent<Rigidbody2D>());
+		conversionSystem.AddHybridComponent(GetComponent<BoxCollider2D>());
 
-			dstManager.AddComponent<DetectorComponent>(entity);
-			dstManager.AddComponent<InputComponent>(entity);
-			dstManager.AddComponent<SimpleDetectorTag>(entity);
-			dstManager.AddComponent<Enabled>(entity);
-			dstManager.AddComponent<CopyTransformFromGameObject>(entity);
-		}
+		dstManager.AddComponent<DetectorComponent>(entity);
+		dstManager.AddComponent<InputComponent>(entity);
+		dstManager.AddComponent<SimpleDetectorTag>(entity);
+		dstManager.AddComponent<Enabled>(entity);
+		dstManager.AddComponent<CopyTransformFromGameObject>(entity);
 	}
+}
 ```
 
 ![](README/step6.png)
@@ -90,21 +90,21 @@ Create a prefab with conversion for the detector
 Create system with custom game logic
 
 ```csharp
-	public class SimpleTriggerEffectSystem : SystemBase
+public class SimpleTriggerEffectSystem : SystemBase
+{
+	protected override void OnUpdate()
 	{
-		protected override void OnUpdate()
-		{
-			Entities.WithoutBurst().WithAll<DetectorComponent>().ForEach(
-				(Entity e, int entityInQueryIndex, ref SimpleTriggerEffect triggerEffect, in SpriteRenderer spriteRenderer) =>
+		Entities.WithoutBurst().WithAll<DetectorComponent>().ForEach(
+			(Entity e, int entityInQueryIndex, ref SimpleTriggerEffect triggerEffect, in SpriteRenderer spriteRenderer) =>
+			{
+				if (!triggerEffect.Used)
 				{
-					if (!triggerEffect.Used)
-					{
-						triggerEffect.Used   = true;
-						spriteRenderer.color = triggerEffect.Color;
-					}
-				}).Run();
-		}
+					triggerEffect.Used   = true;
+					spriteRenderer.color = triggerEffect.Color;
+				}
+			}).Run();
 	}
+}
 ```
 
 ![](README/simple_trigger_effect.gif)
