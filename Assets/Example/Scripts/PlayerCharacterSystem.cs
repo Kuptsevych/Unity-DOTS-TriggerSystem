@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Game
+namespace TriggerSystem.Example
 {
 	public class PlayerCharacterSystem : ComponentSystem
 	{

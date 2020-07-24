@@ -1,47 +1,50 @@
 using Unity.Collections;
 using Unity.Entities;
 
-public class TriggerEffectVfxSystem : ComponentSystem
+namespace TriggerSystem.Example
 {
-	private EntityQuery _entityQuery;
-
-	protected override void OnCreate()
+	public class TriggerEffectVfxSystem : ComponentSystem
 	{
-		var queryDesc = new EntityQueryDesc
+		private EntityQuery _entityQuery;
+
+		protected override void OnCreate()
 		{
-			All = new[]
+			var queryDesc = new EntityQueryDesc
 			{
-				ComponentType.ReadOnly<SimpleSpark>()
-			}
-		};
+				All = new[]
+				{
+					ComponentType.ReadOnly<SimpleSpark>()
+				}
+			};
 
-		_entityQuery = GetEntityQuery(queryDesc);
-	}
-
-	protected override void OnUpdate()
-	{
-		var sparks   = _entityQuery.ToComponentDataArray<SimpleSpark>(Allocator.TempJob);
-		var entities = _entityQuery.ToEntityArray(Allocator.TempJob);
-
-		var dt = Time.DeltaTime;
-
-		for (var i = 0; i < sparks.Length; i++)
-		{
-			var spark = sparks[i];
-
-			spark.Timer += dt;
-
-			if (spark.Timer > spark.DestroyDelay)
-			{
-				PostUpdateCommands.DestroyEntity(entities[i]);
-			}
-
-			sparks[i] = spark;
+			_entityQuery = GetEntityQuery(queryDesc);
 		}
 
-		_entityQuery.CopyFromComponentDataArray(sparks);
+		protected override void OnUpdate()
+		{
+			var sparks   = _entityQuery.ToComponentDataArray<SimpleSpark>(Allocator.TempJob);
+			var entities = _entityQuery.ToEntityArray(Allocator.TempJob);
 
-		sparks.Dispose();
-		entities.Dispose();
+			var dt = Time.DeltaTime;
+
+			for (var i = 0; i < sparks.Length; i++)
+			{
+				var spark = sparks[i];
+
+				spark.Timer += dt;
+
+				if (spark.Timer > spark.DestroyDelay)
+				{
+					PostUpdateCommands.DestroyEntity(entities[i]);
+				}
+
+				sparks[i] = spark;
+			}
+
+			_entityQuery.CopyFromComponentDataArray(sparks);
+
+			sparks.Dispose();
+			entities.Dispose();
+		}
 	}
 }

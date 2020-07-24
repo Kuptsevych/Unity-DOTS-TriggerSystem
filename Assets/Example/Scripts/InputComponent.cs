@@ -1,7 +1,8 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace Game
+
+namespace TriggerSystem.Example
 {
 	[GenerateAuthoringComponent]
 	public struct InputComponent : IComponentData

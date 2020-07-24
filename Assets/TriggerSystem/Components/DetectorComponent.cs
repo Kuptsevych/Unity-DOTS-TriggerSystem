@@ -1,10 +1,13 @@
 using Unity.Entities;
-using Unity.Mathematics;
+using UnityEngine;
 
-[GenerateAuthoringComponent]
-public struct DetectorComponent : IComponentData
+namespace TriggerSystem
 {
-	public int  DetectorId;
-	public int  TriggersCount;
-	public int  TriggersHash;
+	[GenerateAuthoringComponent]
+	public struct DetectorComponent : IComponentData
+	{
+		[HideInInspector] public int DetectorId;
+		[HideInInspector] public int TriggersCount;
+		[HideInInspector] public int TriggersHash;
+	}
 }

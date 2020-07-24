@@ -1,7 +1,11 @@
 ﻿using Unity.Entities;
+using UnityEngine;
 
-[GenerateAuthoringComponent]
-public struct TriggerComponent : IComponentData
+namespace TriggerSystem
 {
-	public int TriggerId;
+	[GenerateAuthoringComponent]
+	public struct TriggerComponent : IComponentData
+	{
+		[HideInInspector] public int TriggerId;
+	}
 }

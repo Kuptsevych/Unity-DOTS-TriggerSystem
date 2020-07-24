@@ -1,8 +1,11 @@
 ﻿using Unity.Entities;
 
-public struct TriggerEffectVfxComponent : IComponentData
+namespace TriggerSystem.Example
 {
-	public Entity VfxPrefab;
-	public float  DepthDelta;
-	public bool   Used;
+	public struct TriggerEffectVfxComponent : IComponentData
+	{
+		public Entity VfxPrefab;
+		public float  DepthDelta;
+		public bool   Used;
+	}
 }

@@ -1,5 +1,8 @@
 using Unity.Entities;
 
-public struct DestroyComponent : IComponentData
+namespace TriggerSystem.Example
 {
+	public struct DestroyComponent : IComponentData
+	{
+	}
 }

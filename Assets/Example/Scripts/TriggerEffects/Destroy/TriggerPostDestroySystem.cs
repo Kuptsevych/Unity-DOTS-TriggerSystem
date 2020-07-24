@@ -1,7 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 
-namespace Game
+namespace TriggerSystem.Example
 {
 	[UpdateAfter(typeof(TriggerDetectorSystem))]
 	public class TriggerPostDestroySystem : ComponentSystem
@@ -30,14 +30,24 @@ namespace Game
 
 			for (var i = 0; i < postTriggers.Length; i++)
 			{
-				if (_triggerInitSystem.ColliderToTriggerEntity.ContainsKey(postTriggers[i].TriggerId))
-				{
-					_triggerInitSystem.ColliderToTriggerEntity.Remove(postTriggers[i].TriggerId);
-					PostUpdateCommands.RemoveComponent<PostDestroyTrigger>(entities[i]);
+				var postTrigger = postTriggers[i];
 
-					PostUpdateCommands.DestroyEntity(entities[i]);
+				postTrigger.SkipFrames -= 1;
+
+				if (postTrigger.SkipFrames < 0)
+				{
+					if (_triggerInitSystem.ColliderToTriggerEntity.ContainsKey(postTriggers[i].TriggerId))
+					{
+						_triggerInitSystem.ColliderToTriggerEntity.Remove(postTriggers[i].TriggerId);
+						PostUpdateCommands.RemoveComponent<PostDestroyTrigger>(entities[i]);
+						PostUpdateCommands.DestroyEntity(entities[i]);
+					}
 				}
+
+				postTriggers[i] = postTrigger;
 			}
+
+			_entityQuery.CopyFromComponentDataArray(postTriggers);
 
 			postTriggers.Dispose();
 			entities.Dispose();

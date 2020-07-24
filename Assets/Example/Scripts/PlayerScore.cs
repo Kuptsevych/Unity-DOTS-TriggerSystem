@@ -1,7 +1,10 @@
 ﻿using Unity.Entities;
 
-[GenerateAuthoringComponent]
-public struct PlayerScore : IComponentData
+namespace TriggerSystem.Example
 {
-	public int  Score;
+	[GenerateAuthoringComponent]
+	public struct PlayerScore : IComponentData
+	{
+		public int Score;
+	}
 }

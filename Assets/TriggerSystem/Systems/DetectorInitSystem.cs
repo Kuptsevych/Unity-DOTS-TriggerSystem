@@ -2,43 +2,46 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-public class DetectorInitSystem : ComponentSystem
+namespace TriggerSystem
 {
-	private EntityQuery _entityQuery;
-
-	protected override void OnCreate()
+	public class DetectorInitSystem : ComponentSystem
 	{
-		var queryDesc = new EntityQueryDesc
+		private EntityQuery _entityQuery;
+
+		protected override void OnCreate()
 		{
-			None = new[] {ComponentType.ReadOnly<Initialized>()},
-			All  = new[] {ComponentType.ReadOnly<DetectorComponent>(), ComponentType.ReadOnly<BoxCollider2D>(),}
-		};
+			var queryDesc = new EntityQueryDesc
+			{
+				None = new[] {ComponentType.ReadOnly<Initialized>()},
+				All  = new[] {ComponentType.ReadOnly<DetectorComponent>(), ComponentType.ReadOnly<BoxCollider2D>(),}
+			};
 
-		_entityQuery = GetEntityQuery(queryDesc);
-	}
-
-	protected override void OnUpdate()
-	{
-		var detectors = _entityQuery.ToComponentDataArray<DetectorComponent>(Allocator.TempJob);
-		var colliders = _entityQuery.ToComponentArray<BoxCollider2D>();
-		var entities  = _entityQuery.ToEntityArray(Allocator.TempJob);
-
-		for (var i = 0; i < detectors.Length; i++)
-		{
-			DetectorComponent detector = detectors[i];
-
-			detector.DetectorId = colliders[i].GetInstanceID();
-
-			detectors[i] = detector;
-			
-			PostUpdateCommands.AddComponent(entities[i], new Initialized());
-
-			EntityManager.AddBuffer<ColliderId>(entities[i]);
+			_entityQuery = GetEntityQuery(queryDesc);
 		}
 
-		_entityQuery.CopyFromComponentDataArray(detectors);
+		protected override void OnUpdate()
+		{
+			var detectors = _entityQuery.ToComponentDataArray<DetectorComponent>(Allocator.TempJob);
+			var colliders = _entityQuery.ToComponentArray<BoxCollider2D>();
+			var entities  = _entityQuery.ToEntityArray(Allocator.TempJob);
 
-		entities.Dispose();
-		detectors.Dispose();
+			for (var i = 0; i < detectors.Length; i++)
+			{
+				DetectorComponent detector = detectors[i];
+
+				detector.DetectorId = colliders[i].GetInstanceID();
+
+				detectors[i] = detector;
+
+				PostUpdateCommands.AddComponent(entities[i], new Initialized());
+
+				EntityManager.AddBuffer<ColliderId>(entities[i]);
+			}
+
+			_entityQuery.CopyFromComponentDataArray(detectors);
+
+			entities.Dispose();
+			detectors.Dispose();
+		}
 	}
 }

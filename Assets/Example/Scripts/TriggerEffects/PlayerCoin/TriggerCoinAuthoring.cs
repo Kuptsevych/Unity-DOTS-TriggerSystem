@@ -1,7 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
 
-namespace Game
+namespace TriggerSystem.Example
 {
 	public class TriggerCoinAuthoring : MonoBehaviour, IConvertGameObjectToEntity
 	{

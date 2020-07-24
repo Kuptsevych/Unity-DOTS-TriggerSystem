@@ -1,7 +1,9 @@
 using Unity.Entities;
 
-
-public struct ColliderId : IBufferElementData
+namespace TriggerSystem
 {
-	public int  Value;
+	public struct ColliderId : IBufferElementData
+	{
+		public int Value;
+	}
 }

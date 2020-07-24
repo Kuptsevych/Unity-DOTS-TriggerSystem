@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace Game
+namespace TriggerSystem.Example
 {
 	[GenerateAuthoringComponent]
 	public struct PlayerComponent : IComponentData

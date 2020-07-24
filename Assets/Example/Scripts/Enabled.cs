@@ -1,6 +1,9 @@
 using Unity.Entities;
 
-[GenerateAuthoringComponent]
-public struct Enabled : IComponentData
+namespace TriggerSystem.Example
 {
+	[GenerateAuthoringComponent]
+	public struct Enabled : IComponentData
+	{
+	}
 }

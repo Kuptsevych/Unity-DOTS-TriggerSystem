@@ -2,8 +2,7 @@
 
 namespace TriggerSystem.Example
 {
-	public struct TriggerCoin : IComponentData
+	public struct SimpleDetectorTag : IComponentData
 	{
-		public int Count;
 	}
 }

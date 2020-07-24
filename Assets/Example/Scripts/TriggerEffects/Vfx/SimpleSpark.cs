@@ -1,8 +1,11 @@
 using Unity.Entities;
 
-[GenerateAuthoringComponent]
-public struct SimpleSpark : IComponentData
+namespace TriggerSystem.Example
 {
-	public float DestroyDelay;
-	public float Timer;
+	[GenerateAuthoringComponent]
+	public struct SimpleSpark : IComponentData
+	{
+		public float DestroyDelay;
+		public float Timer;
+	}
 }

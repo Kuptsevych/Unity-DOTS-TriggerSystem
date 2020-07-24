@@ -13,3 +13,14 @@ The following packages were updated:
   com.unity.shadergraph from version 7.1.8 to 8.1.0
   com.unity.test-framework from version 1.1.11 to 1.1.14
   com.unity.textmeshpro from version 2.0.1 to 3.0.0-preview.1
+
+=== Thu Jul 23 18:32:37 2020
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.render-pipelines.core from version 8.1.0 to 8.2.0
+  com.unity.render-pipelines.lightweight from version 8.1.0 to 8.2.0
+  com.unity.render-pipelines.universal from version 8.1.0 to 8.2.0
+  com.unity.shadergraph from version 8.1.0 to 8.2.0

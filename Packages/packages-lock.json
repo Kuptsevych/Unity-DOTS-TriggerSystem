@@ -161,7 +161,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "8.1.0",
+      "version": "8.2.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -170,22 +170,22 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.lightweight": {
-      "version": "8.1.0",
+      "version": "8.2.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.render-pipelines.universal": "8.1.0",
+        "com.unity.render-pipelines.universal": "8.2.0",
         "com.unity.postprocessing": "2.1.7"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.universal": {
-      "version": "8.1.0",
+      "version": "8.2.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.render-pipelines.core": "8.1.0",
-        "com.unity.shadergraph": "8.1.0"
+        "com.unity.render-pipelines.core": "8.2.0",
+        "com.unity.shadergraph": "8.2.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -226,11 +226,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "8.1.0",
+      "version": "8.2.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.render-pipelines.core": "8.1.0",
+        "com.unity.render-pipelines.core": "8.2.0",
         "com.unity.searcher": "4.0.9"
       },
       "url": "https://packages.unity.com"
@@ -257,7 +257,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.0-preview.1",
+      "version": "3.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {

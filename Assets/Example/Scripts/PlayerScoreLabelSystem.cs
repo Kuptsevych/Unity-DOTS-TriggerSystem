@@ -2,7 +2,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace Game
+namespace TriggerSystem.Example
 {
 	public class PlayerScoreLabelSystem : ComponentSystem
 	{
